@@ -8,7 +8,7 @@ function ListPointage() {
 const [listpointage,setListpointage]=useState([])
 
 const ListPointage=async () =>{
-    const host="http://localhost:5000/pointage?_sort=id&_order=asc"
+    const host="http://pointage-app.000webhostapp.com/api/alluserpointage"
     const response= await (await fetch(host)).json()
     setListpointage(response)
     
@@ -30,6 +30,8 @@ const ListPointage=async () =>{
   <thead>
     <tr>
       <th scope="col">id</th>
+      <th scope="col">prenom</th>
+      <th scope="col">nom</th>
       <th scope="col">phone</th>
       <th scope="col">date</th>
       <th scope="col">heurDarriver</th>
@@ -41,7 +43,9 @@ const ListPointage=async () =>{
              <tbody key={poitage.id}>
              <tr>
              <td>{poitage.id}</td>
-             <td>{poitage.pointerPhones}</td>
+             <td>{poitage.firstName}</td>
+             <td>{poitage.lastName}</td>
+             <td>{poitage.phone}</td>
               <td>{poitage.date}</td>
                <td>{poitage.heurDarriver}</td>
                <td>{poitage.heurDepart}</td>

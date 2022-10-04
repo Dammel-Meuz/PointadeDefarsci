@@ -13,7 +13,7 @@ function NavBar() {
       </li>
       <li className="nav-item p-3 text-hover">
         <Link  className="fs-5 text-decoration-none text-light"
-        to={"/"}>
+        to={"/home"}>
           <img alt="App" src={defarsci} style={{width:'60px',margin:'bottom',display:'bolck'}}
          /> 
         </Link>
@@ -21,13 +21,13 @@ function NavBar() {
       </li>
       <li className="nav-item p-3">
       <Link  className="fs-5 text-decoration-none text-light"
-        to={"/"}>
+        to={"/home"}>
         add pointage
         </Link>
       </li>
       <li className="nav-item p-3">
       <Link  className="fs-5 text-decoration-none text-light"
-        to={"/pointage"}>Pointage</Link>
+        to={"/"}>Pointage</Link>
       </li>
       <li className="nav-item p-3">
       <Link  className="fs-5 text-decoration-none text-light"

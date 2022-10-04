@@ -1,5 +1,6 @@
 import {useState,useEffect} from 'react'
 import{toast} from 'react-toastify'
+import TablePointageJour from './tablePointageJour'
 
 function Pointage() {
 
@@ -8,7 +9,7 @@ function Pointage() {
 
 const ListPointage=async () =>{
   let thisDate=new Date().toLocaleString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})
-    const host=`http://localhost:5000/pointage?date=${thisDate}`
+    const host=`http://pointage-app.000webhostapp.com/api/date/${thisDate}`
     const response= await (await fetch(host)).json()
     setListpointage(response)
     
@@ -25,23 +26,23 @@ let arriver={}
 
 const [pointers,setPointers]=useState([])
 
-const ListPointer=async () =>{
-    const host="http://localhost:5000/pointers?_sort=id&_order=asc"
-    const response= await (await fetch(host)).json()
-    setPointers(response)
-    
-  }
-  
+
+
 //  console.log(valedPointer)
 const setData= async(phonePointer)=>{
 
   let thisDate=new Date().toLocaleString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})
 
-  const host=`http://localhost:5000/pointage?pointerPhones=${phonePointer}&date=${thisDate}`;
+  const host=`http://pointage-app.000webhostapp.com/api/pointage/test/${thisDate}/${phonePointer}`;
   const response= await (await fetch(host)).json()
       // const data = await response.json()
   const updatePointer=response
-  
+//recuperer le pointeur a partir du phone num
+  const hosts=`http://pointage-app.000webhostapp.com/api/phonePointeur/${phonePointer}`;
+  const responses= await (await fetch(hosts)).json()
+      // const data = await response.json()
+      let phonePointeur
+   phonePointeur=responses
   let test=pointers.map((pointer)=>(pointer.phone))
 
   let h = new Date().getHours();
@@ -53,12 +54,14 @@ const setData= async(phonePointer)=>{
 
     if (updatePointer.length !==0){
       depart={
-        date:thisDate,
+        Date:thisDate,
         heurDarriver: updatePointer[0].heurDarriver,
         heurDepart: h+':'+m+':'+s,
-        pointerPhones: updatePointer[0].pointerPhones
+        phone: updatePointer[0].phone,
+        pointeur_id:phonePointeur[0].id,
+        id:updatePointer[0].id
       }
-      await fetch(`http://localhost:5000/pointage/${updatePointer[0].id}`,{
+      await fetch(`http://pointage-app.000webhostapp.com/api/pointage/edit/${updatePointer[0].id}`,{
         method:'PUT',
         headers:{
             'Content-type':'application/json'
@@ -73,12 +76,14 @@ const setData= async(phonePointer)=>{
    
     }else if(updatePointer.length ===0) {
        arriver={
-        date: new Date().toLocaleString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),
+        Date: new Date().toLocaleString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),
         heurDarriver:h+':'+m+':'+s,
         heurDepart:'',
-        pointerPhones:phonePointer
+        phone:phonePointer,
+        pointeur_id:phonePointeur[0].id
+
       }
-      await fetch('http://localhost:5000/pointage',{
+      await fetch('http://pointage-app.000webhostapp.com/api/pointage',{
         method:'POST',
         headers:{
             'Content-type':'application/json'
@@ -88,20 +93,25 @@ const setData= async(phonePointer)=>{
       }) 
 
       toast.success('Bienvenue Pointage valider')
-      // console.log(arriver)
-      // console.log("arriver")
-    }
-
-
-   
-  
+      console.log(arriver)
+       console.log("arriver")
+       console.log(phonePointeur[0])
+    }  
   }else{
     toast.error('num Phone invalid')
+    console.log(updatePointer.length)
+    console.log(test)
+   // console.log(phonePointeur)
+    //console.log(phonePointeur[0][0])
   }
 
 }
-
-
+const ListPointer=async () =>{
+  const host="http://pointage-app.000webhostapp.com/api/pointeur"
+  const response= await (await fetch(host)).json()
+  setPointers(response)
+  
+}
 
 
 
@@ -115,12 +125,13 @@ const setData= async(phonePointer)=>{
         setData(num)
         setNumPhone('')
         ListPointage()
+        
       
         
     }
    
     useEffect(() => {
-        ListPointer()
+       ListPointer()
         ListPointage()
        // console.log(listpointage)
        
@@ -129,47 +140,20 @@ const setData= async(phonePointer)=>{
 
 
   return (
-    <div class="d-flex justify-content-start">
+    <div class="container-fluid mt-3">
        <div className="col-md-1"></div>
-       <div className='col-md-4 p-4 m-4'>
+       <div className='row'>
+       <div className="col-md-4 p-4 m-4 col-sm-6" >
       <form onSubmit={PointerSubmit}>
       <div className="mb-3">
         <label for="phone" className="form-label">Phone</label>
-        <input type="number" className="form-control" id="numPhone" placeholder="phone" value={numPhone}  onChange={onChangenumPhone} required style={{backgroundColor : '#85acdc'}}/>
+        <input type="phone" className="form-control" id="numPhone" placeholder="phone" value={numPhone}  onChange={onChangenumPhone} required style={{backgroundColor : '#85acdc'}}/>
      </div>
      <input type='submit' className="btn  m-2" value="submit" style={{backgroundColor : '#85acdc'}}/>
     </form>
     </div>
-    <div className="col-md-6 p-4 m-4" >
-        <h1>Liste de Pointage du {thisDate}</h1>
-        <div  style={{backgroundColor : '',
-       border: '1px solid black',
-       overflow: 'scroll',}}>
-    <table className="table table-striped table-bordered">
-     
-     <thead>
-       <tr>
-         <th scope="col">id</th>
-         <th scope="col">Phones</th>
-         <th scope="col">date</th>
-         <th scope="col">heurDarriver</th>
-         <th scope="col">heurDepart</th>
-       </tr>
-     </thead>
-     {listpointage.map((poitage)=>(
-                <tbody>
-                <tr>
-              <td>{poitage.id}</td>
-              <td>{poitage.pointerPhones}</td>
-              <td>{poitage.date}</td>
-              <td>{poitage.heurDarriver}</td>
-              <td>{poitage.heurDepart}</td>
-            
-             </tr>
-              </tbody>
-             ))}
-    
-   </table>
+    <div className="col-sm-6 p-4 m-4 col-sm-6" >
+        <TablePointageJour listpointage={listpointage} thisDate={thisDate} />
    </div>
    </div>
    
