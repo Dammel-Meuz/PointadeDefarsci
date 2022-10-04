@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react'
+import {useState} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 
 function EditPointeur() {
@@ -11,12 +11,12 @@ function EditPointeur() {
     phone:'',
     email:''
 })
-const [editdataPointer,setEditDataPointer] =useState({
-    firstName:'',
-    lastName:'',
-    phone:'',
-    email:''
-})
+// const [editdataPointer,setEditDataPointer] =useState({
+//     firstName:'',
+//     lastName:'',
+//     phone:'',
+//     email:''
+// })
 const{firstName,lastName,phone,email} = dataPointer
 //const{firstName,lastName,phone,email} = editdataPointer
 const getPointer=async () =>{
@@ -25,9 +25,9 @@ const getPointer=async () =>{
     setDataPointer(response)
     
   }
-  useEffect(() => {
+  
     getPointer()
-  },[])
+ 
 
   const onChange=(e)=>{
     setDataPointer((prevState)=>({
